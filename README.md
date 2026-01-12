@@ -2,6 +2,8 @@
 
 SerCloud is a premium, secure file management and collaboration platform designed for enterprises. It features a robust setup wizard, role-based access control, and a modern, high-performance UI.
 
+![SerCloud Setup](sercloud_setup_screenshot.png)
+
 ## Features
 
 - **Setup Wizard**: Easy 3-step installation process to configure your specific environment.
