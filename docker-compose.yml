@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  ser-cloud:
+    build: .
+    container_name: ser-cloud
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    volumes:
+      - ./.next/static:/app/.next/static
