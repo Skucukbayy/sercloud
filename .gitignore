@@ -31,3 +31,14 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# data directory (user data)
+/data/
+
+# logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/

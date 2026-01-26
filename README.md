@@ -24,8 +24,8 @@ The easiest way to get SerCloud running is using Docker.
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/YOUR_ORG/ser-cloud.git
-    cd ser-cloud
+    git clone git@github.com:Skucukbayy/sercloud.git
+    cd sercloud
     ```
 
 2.  **Start the application**:
