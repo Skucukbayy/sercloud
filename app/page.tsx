@@ -72,14 +72,8 @@ export default function Home() {
         setContextMenu({ x: e.clientX, y: e.clientY, fileName });
     };
 
-    const allFiles = [
-        { name: "Project Documents", type: "folder", size: "12 files", modified: "2h ago" },
-        { name: "Q4 Finance Report.pdf", type: "file", size: "2.4 MB", modified: "5h ago" },
-        { name: "Product Assets", type: "folder", size: "48 files", modified: "1d ago" },
-        { name: "Meeting Notes.docx", type: "file", size: "142 KB", modified: "2d ago" },
-        { name: "Brand Guidelines.pdf", type: "file", size: "8.1 MB", modified: "3d ago" },
-        { name: "Design Feedback", type: "folder", size: "4 files", modified: "4d ago" },
-    ];
+    // Files will be loaded from actual storage when file system is connected
+    const allFiles: { name: string; type: string; size: string; modified: string }[] = [];
 
     const files = allFiles.filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -191,63 +185,80 @@ export default function Home() {
                     </div>
 
                     {/* Quick Stats / Folders */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {files.map((file, i) => (
-                            <div key={i} onContextMenu={(e) => handleContextMenu(e, file.name)}>
-                                <FileCard {...file} />
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Table Version for List View */}
-                    <div className="mt-12">
-                        <h2 className="text-lg font-bold text-slate-400 mb-4 px-2">Recent Activity</h2>
-                        <div className="glass rounded-3xl overflow-hidden">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="border-b border-slate-800 text-left">
-                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Size</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Last Modified</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-800/50">
-                                    {files.slice(0, 3).map((file, i) => (
-                                        <tr
-                                            key={i}
-                                            className="hover:bg-slate-800/20 transition-colors group cursor-pointer"
-                                            onContextMenu={(e) => handleContextMenu(e, file.name)}
-                                        >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`p-2 rounded-lg ${file.type === 'folder' ? 'text-blue-500' : 'text-slate-400'}`}>
-                                                        {file.type === 'folder' ? <Folder size={18} fill="currentColor" fillOpacity={0.2} /> : <File size={18} />}
-                                                    </div>
-                                                    <span className="font-medium text-slate-200">{file.name}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-slate-400">{file.size}</td>
-                                            <td className="px-6 py-4 text-sm text-slate-400">{file.modified}</td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button className="p-2 text-slate-500 hover:text-blue-400 transition-colors">
-                                                        <Download size={16} />
-                                                    </button>
-                                                    <button className="p-2 text-slate-500 hover:text-indigo-400 transition-colors">
-                                                        <Link2 size={16} />
-                                                    </button>
-                                                    <button className="p-2 text-slate-500 hover:text-red-400 transition-colors">
-                                                        <Trash size={16} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                    {files.length === 0 ? (
+                        <div className="glass p-12 rounded-3xl flex flex-col items-center justify-center text-center">
+                            <Folder size={64} className="text-slate-600 mb-4" />
+                            <h3 className="text-xl font-bold text-slate-300 mb-2">No files yet</h3>
+                            <p className="text-slate-500 mb-6">Upload your first file to get started</p>
+                            <button
+                                onClick={() => setIsUploadOpen(true)}
+                                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all"
+                            >
+                                <Plus size={20} />
+                                Upload Files
+                            </button>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {files.map((file, i) => (
+                                <div key={i} onContextMenu={(e) => handleContextMenu(e, file.name)}>
+                                    <FileCard {...file} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Table Version for List View - Only show if there are files */}
+                    {files.length > 0 && (
+                        <div className="mt-12">
+                            <h2 className="text-lg font-bold text-slate-400 mb-4 px-2">Recent Activity</h2>
+                            <div className="glass rounded-3xl overflow-hidden">
+                                <table className="w-full border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-slate-800 text-left">
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Size</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Last Modified</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800/50">
+                                        {files.slice(0, 3).map((file, i) => (
+                                            <tr
+                                                key={i}
+                                                className="hover:bg-slate-800/20 transition-colors group cursor-pointer"
+                                                onContextMenu={(e) => handleContextMenu(e, file.name)}
+                                            >
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`p-2 rounded-lg ${file.type === 'folder' ? 'text-blue-500' : 'text-slate-400'}`}>
+                                                            {file.type === 'folder' ? <Folder size={18} fill="currentColor" fillOpacity={0.2} /> : <File size={18} />}
+                                                        </div>
+                                                        <span className="font-medium text-slate-200">{file.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-slate-400">{file.size}</td>
+                                                <td className="px-6 py-4 text-sm text-slate-400">{file.modified}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button className="p-2 text-slate-500 hover:text-blue-400 transition-colors">
+                                                            <Download size={16} />
+                                                        </button>
+                                                        <button className="p-2 text-slate-500 hover:text-indigo-400 transition-colors">
+                                                            <Link2 size={16} />
+                                                        </button>
+                                                        <button className="p-2 text-slate-500 hover:text-red-400 transition-colors">
+                                                            <Trash size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>
